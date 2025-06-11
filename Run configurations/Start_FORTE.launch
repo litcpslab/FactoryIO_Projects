@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.fordiac.ide.runLocalFORTE">
+    <stringAttribute key="bad_container_name" value="${eclipse_home}\runtime\4diacFORTE\forte.exe"/>
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_MERGE_OUTPUT" value="true"/>
+    <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+    <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+        <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.fordiac.ide.fortelauncher.arguments" value=""/>
+    <stringAttribute key="org.eclipse.fordiac.ide.fortelauncher.port" value="61499"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="NONE"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${eclipse_home}\runtime\4diacFORTE\forte.exe"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-c localhost:61499 "/>
+</launchConfiguration>
