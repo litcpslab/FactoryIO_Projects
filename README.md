@@ -1,5 +1,5 @@
 
-# IEC 61499 control applications for FactoryIO scenes
+# IEC 61499 Control Applications for FactoryIO Scenes
 
 A repository of IEC 61499 control applications developed using Function Blocks to control various industrial use case scenarios provided in the form of FactoryIO scenes. The control application uses OPC UA communication protocol to interact with the FactoryIO scene.
 
