@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <System Name="FactoryIO_Projects">
-	<VersionInfo Organization="LIT Cyber-Physical Systems Lab" Version="1.0" Author="Mainak Majumder" Date="2025-06-11" Remarks="Copyright (c) 2025 Johannes Kepler University Linz, LIT Cyber-Physical Systems Lab">
+	<Identification Description="Copyright (c) 2025 Johannes Kepler University Linz&#10;LIT Cyber-Physical Systems Lab&#10;&#10;Author: Mainak Majumder">
+	</Identification>
+	<VersionInfo Organization="LIT Cyber-Physical Systems Lab" Version="1.0" Author="Mainak Majumder" Date="2025-06-11" Remarks="Control applications for factoryio sample scenes">
 	</VersionInfo>
 	<Application Name="FromAtoB" Comment="Control a conveyor belt that transports an object from start position to end position">
 		<SubAppNetwork>
@@ -20,21 +22,11 @@
 			</FB>
 			<FB Name="convert_sensor_input" Type="BOOL2BOOL" x="2400" y="400">
 			</FB>
-			<FB Name="read_fio_start_button" Type="SUBSCRIBE_1" x="1000" y="1300">
-				<Parameter Name="QI" Value="TRUE"/>
-				<Parameter Name="ID" Value="&quot;opc_ua[READ;/Objects/FIO_iRunning,1:s=iRunning]&quot;"/>
+			<FB Name="FIO_RUN" Type="E_PERMIT" x="3000" y="-700">
+				<Parameter Name="PERMIT" Value="TRUE"/>
 			</FB>
-			<FB Name="read_fio_reset_button" Type="SUBSCRIBE_1" x="1000" y="2200">
-				<Parameter Name="QI" Value="TRUE"/>
-				<Parameter Name="ID" Value="&quot;opc_ua[READ;/Objects/FIO_iReset,1:s=iReset]&quot;"/>
-			</FB>
-			<FB Name="convert_start_input" Type="BOOL2BOOL" x="2500" y="1600">
-			</FB>
-			<FB Name="convert_reset_input" Type="BOOL2BOOL" x="2500" y="2500">
-			</FB>
-			<FB Name="detect_start_button_press" Type="E_R_TRIG" x="3600" y="1600">
-			</FB>
-			<FB Name="detect_reset_button_press" Type="E_R_TRIG" x="3600" y="2500">
+			<FB Name="FIO_RESET" Type="E_PERMIT" x="4200" y="-700">
+				<Parameter Name="PERMIT" Value="TRUE"/>
 			</FB>
 			<EventConnections>
 				<Connection Source="conveyor_control.EO" Destination="convert_conveyor_output.REQ"/>
@@ -43,24 +35,14 @@
 				<Connection Source="convert_conveyor_output.CNF" Destination="write_conveyor_output.REQ" dx1="420"/>
 				<Connection Source="read_sensor_input.INITO" Destination="write_conveyor_output.INIT"/>
 				<Connection Source="read_sensor_input.IND" Destination="convert_sensor_input.REQ" dx1="353.33"/>
-				<Connection Source="read_sensor_input.INITO" Destination="read_fio_start_button.INIT" dx1="80" dx2="286.67" dy="846.67"/>
-				<Connection Source="read_fio_start_button.INITO" Destination="read_fio_reset_button.INIT" dx1="80" dx2="300" dy="693.33"/>
-				<Connection Source="read_fio_start_button.IND" Destination="convert_start_input.REQ" dx1="300"/>
-				<Connection Source="read_fio_reset_button.IND" Destination="convert_reset_input.REQ" dx1="300"/>
-				<Connection Source="convert_start_input.CNF" Destination="detect_start_button_press.EI"/>
-				<Connection Source="detect_start_button_press.EO" Destination="conveyor_control.S" dx1="333.33"/>
-				<Connection Source="convert_reset_input.CNF" Destination="detect_reset_button_press.EI"/>
-				<Connection Source="detect_reset_button_press.EO" Destination="conveyor_control.S" dx1="333.33"/>
+				<Connection Source="FIO_RUN.EO" Destination="conveyor_control.S" dx1="80"/>
+				<Connection Source="FIO_RESET.EO" Destination="conveyor_control.S" dx1="93.33"/>
 			</EventConnections>
 			<DataConnections>
 				<Connection Source="read_sensor_input.RD_1" Destination="convert_sensor_input.IN"/>
 				<Connection Source="convert_sensor_input.OUT" Destination="detect_input_change.QI"/>
 				<Connection Source="convert_conveyor_output.OUT" Destination="write_conveyor_output.SD_1"/>
 				<Connection Source="conveyor_control.Q" Destination="convert_conveyor_output.IN" dx1="340"/>
-				<Connection Source="read_fio_reset_button.RD_1" Destination="convert_reset_input.IN"/>
-				<Connection Source="read_fio_start_button.RD_1" Destination="convert_start_input.IN"/>
-				<Connection Source="convert_start_input.OUT" Destination="detect_start_button_press.QI"/>
-				<Connection Source="convert_reset_input.OUT" Destination="detect_reset_button_press.QI"/>
 			</DataConnections>
 		</SubAppNetwork>
 	</Application>
@@ -70,10 +52,34 @@
 		<Attribute Name="Color" Type="STRING" Value="255,190,111"/>
 		<Resource Name="EMB_RES" Type="EMB_RES" x="0" y="0">
 			<FBNetwork>
+				<FB Name="read_running" Type="SUBSCRIBE_1" x="500" y="-2000">
+					<Parameter Name="QI" Value="TRUE"/>
+					<Parameter Name="ID" Value="&quot;opc_ua[READ;/Objects/FIO_iRunning,1:s=iRunning]&quot;"/>
+				</FB>
+				<FB Name="read_reset" Type="SUBSCRIBE_1" x="500" y="-1100">
+					<Parameter Name="QI" Value="TRUE"/>
+					<Parameter Name="ID" Value="&quot;opc_ua[READ;/Objects/FIO_iReset,1:s=iReset]&quot;"/>
+				</FB>
+				<FB Name="run_pressed" Type="E_R_TRIG" x="1900" y="-1700">
+				</FB>
+				<FB Name="reset_pressed" Type="E_R_TRIG" x="1900" y="-800">
+				</FB>
+				<Comment Comment="Read FactoryIO button states&#10;Run: Starts the simulation&#10;Reset: Resets the simulation, also resets the data values and states" x="-1800" y="-1300" width="1700" height="500"/>
 				<EventConnections>
 					<Connection Source="START.COLD" Destination="FromAtoB.read_sensor_input.INIT" dx1="600"/>
 					<Connection Source="START.WARM" Destination="FromAtoB.read_sensor_input.INIT" dx1="600"/>
+					<Connection Source="START.COLD" Destination="read_running.INIT" dx1="446.67"/>
+					<Connection Source="START.WARM" Destination="read_running.INIT" dx1="446.67"/>
+					<Connection Source="read_running.INITO" Destination="read_reset.INIT" dx1="80" dx2="80" dy="666.67"/>
+					<Connection Source="read_running.IND" Destination="run_pressed.EI" dx1="300"/>
+					<Connection Source="read_reset.IND" Destination="reset_pressed.EI" dx1="300"/>
+					<Connection Source="run_pressed.EO" Destination="FromAtoB.FIO_RUN.EI"/>
+					<Connection Source="reset_pressed.EO" Destination="FromAtoB.FIO_RESET.EI"/>
 				</EventConnections>
+				<DataConnections>
+					<Connection Source="read_running.RD_1" Destination="run_pressed.QI"/>
+					<Connection Source="read_reset.RD_1" Destination="reset_pressed.QI"/>
+				</DataConnections>
 			</FBNetwork>
 		</Resource>
 	</Device>
@@ -83,10 +89,6 @@
 	<Mapping From="FromAtoB.convert_conveyor_output" To="FORTE_PC.EMB_RES"/>
 	<Mapping From="FromAtoB.read_sensor_input" To="FORTE_PC.EMB_RES"/>
 	<Mapping From="FromAtoB.convert_sensor_input" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.read_fio_start_button" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.read_fio_reset_button" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.convert_reset_input" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.convert_start_input" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.detect_reset_button_press" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.detect_start_button_press" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB.FIO_RESET" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB.FIO_RUN" To="FORTE_PC.EMB_RES"/>
 </System>
