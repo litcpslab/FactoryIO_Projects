@@ -32,9 +32,14 @@ A repository of IEC 61499 control applications developed using Function Blocks t
 Go to *System Configuration* and configure the hostname and port number of your FORTE. In case, you are running a local FORTE, you can leave the default configuration.
 ## FORTE Configuration
 
-The launch configuration uses a local FORTE which should be located in the following directory:
+The launch configuration uses a local FORTE which should be located in the following directory path:
 
-**\Eclipse 4diac IDE directory\runtime\4diacFORTE\\..**
+```bash
+4diac IDE/
+└── runtime/
+    └── 4diacFORTE/
+        └── forte.exe
+```
 
 Therefore, you should copy the executable FOTRE into the following directory. Alternatively, you can configure the path of the local FORTE from the *Run Configuration* by going through the following steps:
 
