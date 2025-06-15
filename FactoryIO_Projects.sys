@@ -4,7 +4,7 @@
 	</Identification>
 	<VersionInfo Organization="LIT Cyber-Physical Systems Lab" Version="1.0" Author="Mainak Majumder" Date="2025-06-11" Remarks="Control applications for factoryio sample scenes">
 	</VersionInfo>
-	<Application Name="FromAtoB" Comment="Control a conveyor belt that transports an object from start position to end position">
+	<Application Name="FromAtoB" Comment="Control a conveyor belt that transports an object from start position (A) to end position (B)">
 		<SubAppNetwork>
 			<FB Name="write_conveyor_output" Type="PUBLISH_1" x="8000" y="100">
 				<Parameter Name="QI" Value="TRUE"/>
@@ -46,6 +46,81 @@
 			</DataConnections>
 		</SubAppNetwork>
 	</Application>
+	<Application Name="FromAtoB_SetReset" Comment="Control two conveyor belts to transports an object from sensor A to sensor B">
+		<SubAppNetwork>
+			<FB Name="write_buffer_conveyor" Type="PUBLISH_1" x="8900" y="700">
+				<Parameter Name="QI" Value="TRUE"/>
+				<Parameter Name="ID" Value="&quot;opc_ua[WRITE;/Objects/FIO_oBufferConveyor,1:s=oBufferConveyor]&quot;"/>
+			</FB>
+			<FB Name="detect_item_A" Type="E_F_TRIG" x="4900" y="1000">
+			</FB>
+			<FB Name="buffer_conveyor_control" Type="E_RS" x="5800" y="1000">
+			</FB>
+			<FB Name="buffer_conveyor_output" Type="BOOL2BOOL" x="7000" y="1000">
+			</FB>
+			<FB Name="read_sensor_A" Type="SUBSCRIBE_1" x="2000" y="700">
+				<Parameter Name="QI" Value="TRUE"/>
+				<Parameter Name="ID" Value="&quot;opc_ua[READ;/Objects/FIO_iSensorA,1:s=iSensorA]&quot;"/>
+			</FB>
+			<FB Name="convert_sensor_A" Type="BOOL2BOOL" x="3300" y="1000">
+			</FB>
+			<FB Name="FIO_RUN" Type="E_PERMIT" x="3900" y="-100">
+				<Parameter Name="PERMIT" Value="TRUE"/>
+			</FB>
+			<FB Name="FIO_RESET" Type="E_PERMIT" x="5100" y="-100">
+				<Parameter Name="PERMIT" Value="TRUE"/>
+			</FB>
+			<FB Name="read_sensor_B" Type="SUBSCRIBE_1" x="2000" y="1800">
+				<Parameter Name="QI" Value="TRUE"/>
+				<Parameter Name="ID" Value="&quot;opc_ua[READ;/Objects/FIO_iSensorB,1:s=iSensorB]&quot;"/>
+			</FB>
+			<FB Name="write_entry_conveyor" Type="PUBLISH_1" x="9000" y="1800">
+				<Parameter Name="QI" Value="TRUE"/>
+				<Parameter Name="ID" Value="&quot;opc_ua[WRITE;/Objects/FIO_oEntryConveyor,1:s=oEntryConveyor]&quot;"/>
+			</FB>
+			<FB Name="entry_conveyor_output" Type="BOOL2BOOL" x="7100" y="2100">
+			</FB>
+			<FB Name="entry_conveyor_control" Type="E_RS" x="5800" y="2100">
+			</FB>
+			<FB Name="convert_sensor_B" Type="BOOL2BOOL" x="3300" y="2100">
+			</FB>
+			<FB Name="detect_input_change_B" Type="E_F_TRIG" x="4700" y="2100">
+			</FB>
+			<FB Name="item_left_A" Type="E_R_TRIG" x="4900" y="1500">
+			</FB>
+			<EventConnections>
+				<Connection Source="buffer_conveyor_control.EO" Destination="buffer_conveyor_output.REQ"/>
+				<Connection Source="read_sensor_A.INITO" Destination="write_buffer_conveyor.INIT"/>
+				<Connection Source="buffer_conveyor_output.CNF" Destination="write_buffer_conveyor.REQ" dx1="420"/>
+				<Connection Source="convert_sensor_A.CNF" Destination="detect_item_A.EI"/>
+				<Connection Source="read_sensor_A.IND" Destination="convert_sensor_A.REQ" dx1="353.33"/>
+				<Connection Source="read_sensor_A.INITO" Destination="read_sensor_B.INIT" dx1="80" dx2="140" dy="720"/>
+				<Connection Source="write_buffer_conveyor.INITO" Destination="write_entry_conveyor.INIT" dx1="80" dx2="220" dy="780"/>
+				<Connection Source="entry_conveyor_output.CNF" Destination="write_entry_conveyor.REQ" dx1="660"/>
+				<Connection Source="entry_conveyor_control.EO" Destination="entry_conveyor_output.REQ"/>
+				<Connection Source="FIO_RESET.EO" Destination="entry_conveyor_control.S" dx1="80"/>
+				<Connection Source="FIO_RUN.EO" Destination="entry_conveyor_control.S" dx1="80"/>
+				<Connection Source="read_sensor_B.IND" Destination="convert_sensor_B.REQ" dx1="260"/>
+				<Connection Source="convert_sensor_B.CNF" Destination="detect_input_change_B.EI"/>
+				<Connection Source="convert_sensor_A.CNF" Destination="item_left_A.EI" dx1="440"/>
+				<Connection Source="detect_item_A.EO" Destination="buffer_conveyor_control.S" dx1="273.33"/>
+				<Connection Source="item_left_A.EO" Destination="entry_conveyor_control.R" dx1="260"/>
+				<Connection Source="detect_input_change_B.EO" Destination="buffer_conveyor_control.R" dx1="293.33"/>
+				<Connection Source="FIO_RESET.EO" Destination="buffer_conveyor_control.R" dx1="173.33"/>
+			</EventConnections>
+			<DataConnections>
+				<Connection Source="buffer_conveyor_output.OUT" Destination="write_buffer_conveyor.SD_1"/>
+				<Connection Source="convert_sensor_A.OUT" Destination="detect_item_A.QI"/>
+				<Connection Source="read_sensor_A.RD_1" Destination="convert_sensor_A.IN"/>
+				<Connection Source="buffer_conveyor_control.Q" Destination="buffer_conveyor_output.IN" dx1="340"/>
+				<Connection Source="entry_conveyor_output.OUT" Destination="write_entry_conveyor.SD_1"/>
+				<Connection Source="entry_conveyor_control.Q" Destination="entry_conveyor_output.IN" dx1="246.67"/>
+				<Connection Source="read_sensor_B.RD_1" Destination="convert_sensor_B.IN"/>
+				<Connection Source="convert_sensor_B.OUT" Destination="detect_input_change_B.QI"/>
+				<Connection Source="convert_sensor_A.OUT" Destination="item_left_A.QI" dx1="440"/>
+			</DataConnections>
+		</SubAppNetwork>
+	</Application>
 	<Device Name="FORTE_PC" Type="FORTE_PC" x="4033.33" y="1560">
 		<Parameter Name="MGR_ID" Value="&quot;localhost:61499&quot;" Comment="Device manager socket ID"/>
 		<Attribute Name="Profile" Type="STRING" Value="HOLOBLOC"/>
@@ -66,15 +141,15 @@
 				</FB>
 				<Comment Comment="Read FactoryIO button states&#10;Run: Starts the simulation&#10;Reset: Resets the simulation, also resets the data values and states" x="-1800" y="-1300" width="1700" height="500"/>
 				<EventConnections>
-					<Connection Source="START.COLD" Destination="FromAtoB.read_sensor_input.INIT" dx1="600"/>
-					<Connection Source="START.WARM" Destination="FromAtoB.read_sensor_input.INIT" dx1="600"/>
 					<Connection Source="START.COLD" Destination="read_running.INIT" dx1="446.67"/>
 					<Connection Source="START.WARM" Destination="read_running.INIT" dx1="446.67"/>
 					<Connection Source="read_running.INITO" Destination="read_reset.INIT" dx1="80" dx2="80" dy="666.67"/>
 					<Connection Source="read_running.IND" Destination="run_pressed.EI" dx1="300"/>
 					<Connection Source="read_reset.IND" Destination="reset_pressed.EI" dx1="300"/>
-					<Connection Source="run_pressed.EO" Destination="FromAtoB.FIO_RUN.EI"/>
-					<Connection Source="reset_pressed.EO" Destination="FromAtoB.FIO_RESET.EI"/>
+					<Connection Source="reset_pressed.EO" Destination="FromAtoB_SetReset.FIO_RESET.EI" dx1="2313.33"/>
+					<Connection Source="run_pressed.EO" Destination="FromAtoB_SetReset.FIO_RUN.EI" dx1="673.33"/>
+					<Connection Source="START.COLD" Destination="FromAtoB_SetReset.read_sensor_A.INIT" dx1="1546.67"/>
+					<Connection Source="START.WARM" Destination="FromAtoB_SetReset.read_sensor_A.INIT" dx1="1546.67"/>
 				</EventConnections>
 				<DataConnections>
 					<Connection Source="read_running.RD_1" Destination="run_pressed.QI"/>
@@ -83,12 +158,19 @@
 			</FBNetwork>
 		</Resource>
 	</Device>
-	<Mapping From="FromAtoB.write_conveyor_output" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.detect_input_change" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.conveyor_control" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.convert_conveyor_output" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.read_sensor_input" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.convert_sensor_input" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.FIO_RESET" To="FORTE_PC.EMB_RES"/>
-	<Mapping From="FromAtoB.FIO_RUN" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.write_buffer_conveyor" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.detect_item_A" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.buffer_conveyor_control" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.buffer_conveyor_output" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.read_sensor_A" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.convert_sensor_A" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.FIO_RUN" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.FIO_RESET" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.write_entry_conveyor" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.read_sensor_B" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.entry_conveyor_output" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.entry_conveyor_control" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.convert_sensor_B" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.detect_input_change_B" To="FORTE_PC.EMB_RES"/>
+	<Mapping From="FromAtoB_SetReset.item_left_A" To="FORTE_PC.EMB_RES"/>
 </System>
