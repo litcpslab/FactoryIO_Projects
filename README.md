@@ -4,8 +4,6 @@
 A repository of IEC 61499 control applications developed using Function Blocks to control various industrial use case scenarios provided in the form of FactoryIO scenes. The control application uses OPC UA communication protocol to interact with the FactoryIO scene.
 
 
-
-
 ## Documentation
 
 [FactoryIO Scenes](https://docs.factoryio.com/manual/scenes/)
@@ -46,6 +44,11 @@ Therefore, you should copy the executable FOTRE into the following directory. Al
  - Open *Run Configuration*
  - Left click on *Start_FORTE*
  - click *Browse* for the *FORTE location* option and select the local FORTE
+
+## FB Mapping
+
+Map the FB network to the resource (EMB_RES) of the local FORTE (in case they are not mapped already i.e., not filled with colours). You can do that by first, selecting all the FBs and right-clicking on them to open the options. From the options, select *Map to* to map the FBs to resource.   
+
 
 ## Deployment
 
